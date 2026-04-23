@@ -1,0 +1,5 @@
+# Variables
+CC=gcc
+CFLAGS = -I include -Wall
+
+# A commencer
