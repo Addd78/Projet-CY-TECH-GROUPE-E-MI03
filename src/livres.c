@@ -1,4 +1,4 @@
-// Gestion des livres (Ajouter ou supprimer un livre)
+// Gestion des livres (Ajouter un livre)
 // Algorythmes de Tri (par le titre ou l'auteur)
 // Foction de recherche avec des mots-clé
 
@@ -6,7 +6,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "livres.h"
+
+#define CLEAR "\033[2J\033[H"
 
 int charger_livres(Livre biblio[], int *nbLivres){
     FILE *f = fopen("data/livres.txt", "r");
@@ -26,17 +29,85 @@ int charger_livres(Livre biblio[], int *nbLivres){
         &biblio[*nbLivres].quantite_disponible) != EOF) {
             (*nbLivres)++;
     }
+    fclose(f);
+    return 1;
 }
 
-void afficher_les_livres(Livre biblio[], int nbLivres) {
-    //Je sais pas comment on va afficher :)
-
-    for (int i = 0; i < nbLivres; i++) {
-        printf("%d | %s | %s | %d/%d",
+void sauvegarder_livres(Livre biblio[], int nbLivres) {
+    FILE *f = fopen("data/livres.txt", "w");
+    if (f = NULL) return;
+    for (int i = 0; i < nbLivres; i++){
+        fprintf(f, "%d;%s;%s;%s;%d;%d\n",
             biblio[i].id,
             biblio[i].titre,
             biblio[i].auteur,
             biblio[i].quantite_disponible,
             biblio[i].quantite_totale);
     }
+    fclose(f);
+}
+
+void afficher_les_livres(Livre biblio[], int nbLivres) {
+    printf("\033[2J\033[H");
+    printf("################ CATALOGUE DES LIVRES ################\n\n");
+
+    if (nbLivres == 0) {
+        printf(" [!] Aucun livre se trouve dans la base de donnees.\n");
+    }
+    else {
+        printf("  ID   | TITRE                | AUTEUR          | DISPO\n");
+        printf("  -----|----------------------|-----------------|------\n");
+
+        for (int i = 0; i < nbLivres; i++) {
+            printf("%-4d | %-20.20s | %-15.15s | %d/%d\n",
+                biblio[i].id,
+                biblio[i].titre,
+                biblio[i].auteur,
+                biblio[i].quantite_disponible,
+                biblio[i].quantite_totale);
+        }
+    }
+
+    printf("\n######################################################\n");
+}
+
+void rechercher_livre(Livre biblio[], int nbLivres) {
+    char recherche[50];
+    int trouve = 0;
+
+    printf(CLEAR);
+    printf("################ RECHERCHE DE LIVRES ################\n\n");
+
+    printf("  Entrez un mot-cle (titre, auteur, categorie) : ");
+
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+    
+    fgets(recherche, sizeof(recherche), stdin);
+    recherche[strcspn(recherche, "\n")] = '\0';
+
+    printf("\n  Resultats pour \"%s\" :\n", recherche);
+    printf("  --------------------------------------------------\n");
+
+    for (int i = 0; i < nbLivres; i++){
+        if (strstr(biblio[i].titre, recherche) != NULL || 
+            strstr(biblio[i].auteur, recherche) != NULL || 
+            strstr(biblio[i].categorie, recherche) != NULL){
+            
+            printf("  [%d] %-20s | %-15s | %d dispo\n", 
+                biblio[i].id,
+                biblio[i].titre,
+                biblio[i].auteur,
+                biblio[i].quantite_disponible,
+                biblio[i].quantite_totale);
+            trouve = 1;
+        }
+        
+    }
+    
+    if (!trouve) {
+        printf("[!] Aucun livre ne correspond à votre recherche.\n");
+    }
+
+    printf("\n#####################################################\n");
 }

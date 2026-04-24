@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "livres.h"
+
 #define CLEAR "\033[2J\033[H"
 #define LARGEUR 52
 
@@ -133,14 +135,13 @@ static void menu_principal(void) {
             break;
 
         case '4':
-            // TODO : appeler rechercher_livre() depuis livres.c
+            rechercher_livre(biblio, nbLivres);
             printf("\n  [TODO] Rechercher un livre (titre / auteur / categorie)\n");
             pause_entree();
             break;
 
         case '5':
-            // TODO : appeler afficher_les_livres() depuis livres.c
-            printf("\n  [TODO] Liste complete des livres\n");
+            afficher_les_livres(biblio, nbLivres);  // appelle de la fonction
             pause_entree();
             break;
 
@@ -180,8 +181,14 @@ static void menu_principal(void) {
 // ─────────────────────────────────────────────
 //  POINT D'ENTREE
 // ─────────────────────────────────────────────
+
 int main(void) {
-    // TODO : charger_livres(biblio, &nbLivres);
+
+    Livre biblio[200];
+    int nbLivres = 0;
+
+    charger_livres(biblio, &nbLivres); // remplir le tableu au démarage
+
     // TODO : charger_utilisateurs(users, &nbUsers);
 
     while (1) {
