@@ -4,19 +4,33 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "../include/utilisateurs.h"
 
-#include "livres.h"
-
+// ─────────────────────────────────────────────
+//  EFFACEMENT DE L'ECRAN
+// ─────────────────────────────────────────────
 #define CLEAR "\033[2J\033[H"
+
+// ─────────────────────────────────────────────
+//  DIMENSIONS
+// ─────────────────────────────────────────────
 #define LARGEUR 52
 
 // ─────────────────────────────────────────────
-//  ETAT DE SESSION (a relier aux autres modules)
+//  DONNEES UTILISATEURS (chargees au demarrage)
 // ─────────────────────────────────────────────
-static int  connecte         = 0;
-static char login_actuel[64] = "";
-static int  est_professeur   = 0;
+static Utilisateur  users[MAX_UTILISATEURS];  // tableau de tous les utilisateurs
+static int          nb_users = 0;             // nombre d'utilisateurs charges
 
+// ─────────────────────────────────────────────
+//  ETAT DE SESSION
+// ─────────────────────────────────────────────
+static int         connecte       = 0;
+static Utilisateur user_actuel;               // utilisateur actuellement connecte
+
+// ─────────────────────────────────────────────
+//  HELPERS D'AFFICHAGE
+// ─────────────────────────────────────────────
 
 static void afficher_bandeau(const char *titre) {
     int titre_len = (int)strlen(titre);
@@ -48,6 +62,10 @@ static void pause_entree(void) {
     printf("  (Appuyez sur Entree pour continuer)");
     getchar();
 }
+
+// ─────────────────────────────────────────────
+//  MENU DE CONNEXION
+// ─────────────────────────────────────────────
 static void menu_connexion(void) {
     printf(CLEAR);
     afficher_bandeau("CY-biblioTECH");
@@ -61,22 +79,63 @@ static void menu_connexion(void) {
     char c = lire_touche();
 
     switch (c) {
-        case '1':
-            // TODO : appeler login() depuis utilisateurs.c
-            printf("\n  Login : ");
-            fgets(login_actuel, sizeof(login_actuel), stdin);
-            login_actuel[strcspn(login_actuel, "\n")] = '\0';
-            connecte       = 1;
-            est_professeur = 0; // TODO : lire le role depuis le fichier
-            printf("\n  Bienvenue, %s !\n", login_actuel);
-            pause_entree();
-            break;
+        case '1': {
+            // Saisie du login
+            char login_saisi[TAILLE_LOGIN];
+            char mdp_saisi[TAILLE_MDP];
 
-        case '2':
-            // TODO : appeler creer_compte() depuis utilisateurs.c
-            printf("\n  [TODO] Creation de compte\n");
+            printf("\n  Login      : ");
+            fgets(login_saisi, sizeof(login_saisi), stdin);
+            login_saisi[strcspn(login_saisi, "\n")] = '\0';
+
+            printf("  Mot de passe : ");
+            fgets(mdp_saisi, sizeof(mdp_saisi), stdin);
+            mdp_saisi[strcspn(mdp_saisi, "\n")] = '\0';
+
+            // Appel de la fonction login() depuis utilisateurs.c
+            if (login(users, nb_users, login_saisi, mdp_saisi, &user_actuel)) {
+                connecte = 1;
+                printf("\n  Bienvenue, %s ! (%s)\n",
+                       user_actuel.login,
+                       user_actuel.role == PROFESSEUR ? "Professeur" : "Etudiant");
+            } else {
+                printf("\n  Login ou mot de passe incorrect.\n");
+            }
             pause_entree();
             break;
+        }
+
+        case '2': {
+            // Saisie des informations du nouveau compte
+            char login_saisi[TAILLE_LOGIN];
+            char mdp_saisi[TAILLE_MDP];
+            char role_saisi[4];
+
+            printf("\n  Choisissez un login      : ");
+            fgets(login_saisi, sizeof(login_saisi), stdin);
+            login_saisi[strcspn(login_saisi, "\n")] = '\0';
+
+            printf("  Choisissez un mot de passe : ");
+            fgets(mdp_saisi, sizeof(mdp_saisi), stdin);
+            mdp_saisi[strcspn(mdp_saisi, "\n")] = '\0';
+
+            printf("  Role (0 = Etudiant, 1 = Professeur) : ");
+            fgets(role_saisi, sizeof(role_saisi), stdin);
+            Role role = (role_saisi[0] == '1') ? PROFESSEUR : ETUDIANT;
+
+            // Appel de la fonction creer_compte() depuis utilisateurs.c
+            int resultat = creer_compte(users, &nb_users,
+                                        login_saisi, mdp_saisi, role);
+            if (resultat == 1) {
+                printf("\n  Compte cree avec succes ! Vous pouvez maintenant vous connecter.\n");
+            } else if (resultat == 0) {
+                printf("\n  Ce login est deja utilise, choisissez-en un autre.\n");
+            } else {
+                printf("\n  Erreur lors de la creation du compte.\n");
+            }
+            pause_entree();
+            break;
+        }
 
         case '0':
             printf(CLEAR "  Au revoir !\n\n");
@@ -98,15 +157,16 @@ static void menu_principal(void) {
     printf("\n");
 
     printf("  Connecte en tant que : %s (%s)\n\n",
-           login_actuel,
-           est_professeur ? "Professeur" : "Etudiant");
+           user_actuel.login,
+           user_actuel.role == PROFESSEUR ? "Professeur" : "Etudiant");
 
     afficher_option("1", "Emprunter un livre",          1);
     afficher_option("2", "Rendre un livre",             1);
     afficher_option("3", "Mes emprunts en cours",       1);
     afficher_option("4", "Rechercher un livre",         1);
     afficher_option("5", "Liste de tous les livres",    1);
-    afficher_option("6", "Ajouter un livre au catalogue", est_professeur);
+    afficher_option("6", "Ajouter un livre au catalogue",
+                    user_actuel.role == PROFESSEUR);
     afficher_option("7", "Voir mes retards",            1);
     afficher_option("9", "Se deconnecter",              1);
     afficher_option("0", "Quitter l'application",       1);
@@ -135,18 +195,19 @@ static void menu_principal(void) {
             break;
 
         case '4':
-            rechercher_livre(biblio, nbLivres);
+            // TODO : appeler rechercher_livre() depuis livres.c
             printf("\n  [TODO] Rechercher un livre (titre / auteur / categorie)\n");
             pause_entree();
             break;
 
         case '5':
-            afficher_les_livres(biblio, nbLivres);  // appelle de la fonction
+            // TODO : appeler afficher_les_livres() depuis livres.c
+            printf("\n  [TODO] Liste complete des livres\n");
             pause_entree();
             break;
 
         case '6':
-            if (est_professeur) {
+            if (user_actuel.role == PROFESSEUR) {
                 // TODO : appeler ajouter_livre() depuis livres.c
                 printf("\n  [TODO] Ajouter un livre au catalogue\n");
             } else {
@@ -163,8 +224,7 @@ static void menu_principal(void) {
 
         case '9':
             connecte = 0;
-            memset(login_actuel, 0, sizeof(login_actuel));
-            est_professeur = 0;
+            memset(&user_actuel, 0, sizeof(user_actuel));
             break;
 
         case '0':
@@ -181,15 +241,15 @@ static void menu_principal(void) {
 // ─────────────────────────────────────────────
 //  POINT D'ENTREE
 // ─────────────────────────────────────────────
-
 int main(void) {
+    // Chargement des utilisateurs au demarrage
+    nb_users = charger_utilisateurs(users, MAX_UTILISATEURS);
+    if (nb_users == -1) {
+        printf("  Erreur : impossible de charger les utilisateurs.\n");
+        return 1;
+    }
 
-    Livre biblio[200];
-    int nbLivres = 0;
-
-    charger_livres(biblio, &nbLivres); // remplir le tableu au démarage
-
-    // TODO : charger_utilisateurs(users, &nbUsers);
+    // TODO : charger_livres(biblio, &nbLivres);
 
     while (1) {
         if (!connecte)
