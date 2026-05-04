@@ -2,6 +2,7 @@
 #define LIVRES_H
 #define MAX_STR 100
 
+// Structure du livre : ID;Titre;Auteur;Categorie;Total;Dispo
 typedef struct {
     int id;
     char titre[MAX_STR];
@@ -11,8 +12,19 @@ typedef struct {
     int quantite_disponible;
 } Livre;
 
+// Charge les livres depuis le fichier data/livres.txt.
 int chargerLivres(Livre biblio[], int *nbLivres);
 
-// appelle des fonctions dans src/livres.c
+// Sauvegarde le tableau de livres actuel dans data/livres.txt.
+void sauvegarder_livres(Livre biblio[], int nbLivres);
+
+// Affiche la liste complète des livres
+void afficher_les_livres(Livre biblio[], int nbLivres);
+
+// Recherche un livre par mot-clé
+void rechercher_livre(Livre biblio[], int nbLivres);
+
+// ajout d'un livre au catalogue
+void ajouter_livre(Livre biblio[], int *nbLivres);
 
 #endif

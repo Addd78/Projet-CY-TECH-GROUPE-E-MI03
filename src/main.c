@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../include/utilisateurs.h"
+#include "../include/livres.h"
 
 // ─────────────────────────────────────────────
 //  EFFACEMENT DE L'ECRAN
@@ -151,7 +152,7 @@ static void menu_connexion(void) {
 // ─────────────────────────────────────────────
 //  MENU PRINCIPAL (apres connexion)
 // ─────────────────────────────────────────────
-static void menu_principal(void) {
+static void menu_principal(Livre biblio[], int *nb_livres) {
     printf(CLEAR);
     afficher_bandeau("MENU PRINCIPAL");
     printf("\n");
@@ -195,20 +196,20 @@ static void menu_principal(void) {
             break;
 
         case '4':
-            // TODO : appeler rechercher_livre() depuis livres.c
+            rechercher_livre(biblio, nb_livres);
             printf("\n  [TODO] Rechercher un livre (titre / auteur / categorie)\n");
             pause_entree();
             break;
 
         case '5':
-            // TODO : appeler afficher_les_livres() depuis livres.c
+            afficher_les_livres(biblio, nb_livres);
             printf("\n  [TODO] Liste complete des livres\n");
             pause_entree();
             break;
 
         case '6':
             if (user_actuel.role == PROFESSEUR) {
-                // TODO : appeler ajouter_livre() depuis livres.c
+                ajouter_livre(biblio, &nb_livres);
                 printf("\n  [TODO] Ajouter un livre au catalogue\n");
             } else {
                 printf("\n  Acces reserve aux professeurs.\n");
@@ -242,20 +243,25 @@ static void menu_principal(void) {
 //  POINT D'ENTREE
 // ─────────────────────────────────────────────
 int main(void) {
-    // Chargement des utilisateurs au demarrage
+
+    Livre biblio[200];
+    int nb_livres = 0;
+
     nb_users = charger_utilisateurs(users, MAX_UTILISATEURS);
+    charger_livres(biblio, &nb_livres);
+
     if (nb_users == -1) {
         printf("  Erreur : impossible de charger les utilisateurs.\n");
         return 1;
     }
 
-    // TODO : charger_livres(biblio, &nbLivres);
+    // TODO : charger_livres(biblio, &nb_livres);
 
     while (1) {
         if (!connecte)
             menu_connexion();
-        else
-            menu_principal();
+        else    
+            menu_principal(biblio, &nb_livres);
     }
 
     return 0;

@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "livres.h"
+#include "../include/livres.h"
 
 #define CLEAR "\033[2J\033[H"
 
@@ -110,4 +110,30 @@ void rechercher_livre(Livre biblio[], int nbLivres) {
     }
 
     printf("\n#####################################################\n");
+}
+
+// Ajout d'un livre (réservé aux professeurs dans le main)
+
+void ajouter_livre(Livre biblio[], int *nbLivres) {
+    printf(CLEAR);
+    printf("################ AJOUTER UN LIVRE ################\n\n");
+    
+    Livre n;
+    n.id = (*nbLivres > 0) ? biblio[*nbLivres - 1].id + 1 : 1;
+
+    printf("  Titre : ");
+    fgets(n.titre, 100, stdin); n.titre[strcspn(n.titre, "\n")] = '\0';
+    printf("  Auteur : ");
+    fgets(n.auteur, 100, stdin); n.auteur[strcspn(n.auteur, "\n")] = '\0';
+    printf("  Categorie : ");
+    fgets(n.categorie, 50, stdin); n.categorie[strcspn(n.categorie, "\n")] = '\0';
+    printf("  Quantite totale : ");
+    scanf("%d", &n.quantite_totale);
+    n.quantite_disponible = n.quantite_totale;
+    getchar();
+
+    biblio[*nbLivres] = n;
+    (*nbLivres)++;
+    sauvegarder_livres(biblio, *nbLivres);
+    printf("\n  [V] Livre ajoute avec succes !\n");
 }
