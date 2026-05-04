@@ -1,0 +1,19 @@
+1;Harry Potter a l'ecole des sorciers;J.K. Rowling;Fantastique;5;5
+2;Harry Potter et la Chambre des secrets;J.K. Rowling;Fantastique;5;5
+3;Harry Potter et le Prisonnier d'Azkaban;J.K. Rowling;Fantastique;5;5
+4;Harry Potter et la Coupe de feu;J.K. Rowling;Fantastique;5;5
+5;Harry Potter et l'Ordre du Phenix;J.K. Rowling;Fantastique;5;5
+6;Harry Potter et le Prince de Sang-Mele;J.K. Rowling;Fantastique;5;5
+7;Harry Potter et les Reliques de la Mort;J.K. Rowling;Fantastique;5;5
+8;Dune;Frank Herbert;Science-Fiction;3;3
+9;Le Messie de Dune;Frank Herbert;Science-Fiction;3;3
+10;Les Enfants de Dune;Frank Herbert;Science-Fiction;3;3
+11;L'Empereur-Dieu de Dune;Frank Herbert;Science-Fiction;3;3
+12;Les Heretiques de Dune;Frank Herbert;Science-Fiction;3;3
+13;La Maison des meres;Frank Herbert;Science-Fiction;3;3
+14;Hunger Games;Suzanne Collins;Dystopie;4;4
+15;Hunger Games: L'Embrasement;Suzanne Collins;Dystopie;4;4
+16;Hunger Games: La Revolte;Suzanne Collins;Dystopie;4;4
+17;Divergente;Veronica Roth;Dystopie;4;4
+18;Divergente 2;Veronica Roth;Dystopie;4;4
+19;Divergente 3;Veronica Roth;Dystopie;4;4
