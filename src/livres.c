@@ -35,14 +35,14 @@ int charger_livres(Livre biblio[], int *nbLivres){
 
 void sauvegarder_livres(Livre biblio[], int nbLivres) {
     FILE *f = fopen("data/livres.txt", "w");
-    if (f = NULL) return;
+    if (f == NULL) return;
     for (int i = 0; i < nbLivres; i++){
         fprintf(f, "%d;%s;%s;%s;%d;%d\n",
             biblio[i].id,
             biblio[i].titre,
             biblio[i].auteur,
-            biblio[i].quantite_disponible,
-            biblio[i].quantite_totale);
+            biblio[i].quantite_totale,
+            biblio[i].quantite_disponible);
     }
     fclose(f);
 }
@@ -63,8 +63,8 @@ void afficher_les_livres(Livre biblio[], int nbLivres) {
                 biblio[i].id,
                 biblio[i].titre,
                 biblio[i].auteur,
-                biblio[i].quantite_disponible,
-                biblio[i].quantite_totale);
+                biblio[i].quantite_totale,
+                biblio[i].quantite_disponible);
         }
     }
 
@@ -77,13 +77,15 @@ void rechercher_livre(Livre biblio[], int nbLivres) {
 
     printf(CLEAR);
     printf("################ RECHERCHE DE LIVRES ################\n\n");
-
     printf("  Entrez un mot-cle (titre, auteur, categorie) : ");
+    
+    fgets(recherche, sizeof(recherche), stdin);
+
+    scanf("%49[^\n]",recherche);
 
     int c;
     while ((c = getchar()) != '\n' && c != EOF);
     
-    fgets(recherche, sizeof(recherche), stdin);
     recherche[strcspn(recherche, "\n")] = '\0';
 
     printf("\n  Resultats pour \"%s\" :\n", recherche);
@@ -98,8 +100,8 @@ void rechercher_livre(Livre biblio[], int nbLivres) {
                 biblio[i].id,
                 biblio[i].titre,
                 biblio[i].auteur,
-                biblio[i].quantite_disponible,
-                biblio[i].quantite_totale);
+                biblio[i].quantite_totale,
+                biblio[i].quantite_disponible);
             trouve = 1;
         }
         

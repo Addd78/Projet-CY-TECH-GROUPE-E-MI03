@@ -13,7 +13,7 @@ typedef struct {
 } Livre;
 
 // Charge les livres depuis le fichier data/livres.txt.
-int chargerLivres(Livre biblio[], int *nbLivres);
+int charger_livres(Livre biblio[], int *nbLivres);
 
 // Sauvegarde le tableau de livres actuel dans data/livres.txt.
 void sauvegarder_livres(Livre biblio[], int nbLivres);

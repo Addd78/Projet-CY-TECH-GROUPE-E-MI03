@@ -6,6 +6,7 @@
 #include <string.h>
 #include "../include/utilisateurs.h"
 #include "../include/livres.h"
+#include "../include/emprunts.h"
 
 // ─────────────────────────────────────────────
 //  EFFACEMENT DE L'ECRAN
@@ -178,14 +179,12 @@ static void menu_principal(Livre biblio[], int *nb_livres) {
 
     switch (c) {
         case '1':
-            // TODO : appeler emprunter_livre() depuis emprunts.c
-            printf("\n  [TODO] Emprunter un livre\n");
+            emprunter_livre(biblio, *nb_livres, &user_actuel);
             pause_entree();
             break;
 
         case '2':
-            // TODO : appeler rendre_livre() depuis emprunts.c
-            printf("\n  [TODO] Rendre un livre\n");
+            rendre_livre(biblio, *nb_livres, &user_actuel);
             pause_entree();
             break;
 
@@ -254,8 +253,6 @@ int main(void) {
         printf("  Erreur : impossible de charger les utilisateurs.\n");
         return 1;
     }
-
-    // TODO : charger_livres(biblio, &nb_livres);
 
     while (1) {
         if (!connecte)
