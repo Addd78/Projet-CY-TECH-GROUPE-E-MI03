@@ -102,6 +102,17 @@ void emprunter_livre(Livre biblio[], int nb_livres, Utilisateur *user) {
         // Sauvegarder dans livres.txt
         sauvegarder_livres(biblio, nb_livres);
 
+        // Enregistrer l'emprunt dans emprunts.txt
+        FILE *fe = fopen(FICHIER_EMPRUNTS, "a");
+        if (fe != NULL) {
+            time_t t = time(NULL);
+            struct tm *tm_info = localtime(&t);
+            char date_str[11];
+            strftime(date_str, sizeof(date_str), "%d/%m/%Y", tm_info);
+            fprintf(fe, "%s:%d:%s:0\n", user->login, biblio[index_livre].id, date_str);
+            fclose(fe);
+        }
+
         printf("  [V] Succes ! Vous avez recupere : %s\n",
                biblio[index_livre].titre);
         printf("      Il reste %d exemplaire(s) en rayon.\n",
@@ -156,10 +167,6 @@ void rendre_livre(Livre biblio[], int nb_livres, Utilisateur *user) {
     int id_voulu;
     int index_livre = -1;
 
-    // Le parametre user est present pour une utilisation future
-    // (ex : marquer l'emprunt comme rendu dans emprunts.txt)
-    (void)user;
-
     printf("\n--- RENDRE UN LIVRE ---\n");
     printf("  Entrez l'ID du livre que vous souhaitez rendre : ");
     if (scanf("%d", &id_voulu) != 1) {
@@ -188,6 +195,34 @@ void rendre_livre(Livre biblio[], int nb_livres, Utilisateur *user) {
         printf("  [!] Erreur : Tous les exemplaires de '%s' sont deja en rayon.\n",
                biblio[index_livre].titre);
         return;
+    }
+
+    // Marquer l'emprunt comme rendu dans emprunts.txt
+    FILE *f_in = fopen(FICHIER_EMPRUNTS, "r");
+    if (f_in != NULL) {
+        char tmp_path[] = "data/emprunts_tmp.txt";
+        FILE *f_out = fopen(tmp_path, "w");
+        if (f_out != NULL) {
+            Emprunt e;
+            int updated = 0;
+            while (fscanf(f_in, "%[^:]:%d:%[^:]:%d\n",
+                          e.login, &e.id_livre, e.date_emprunt, &e.rendu) == 4) {
+                if (!updated && strcmp(e.login, user->login) == 0
+                    && e.id_livre == id_voulu && e.rendu == 0) {
+                    e.rendu = 1;
+                    updated = 1;
+                }
+                fprintf(f_out, "%s:%d:%s:%d\n",
+                        e.login, e.id_livre, e.date_emprunt, e.rendu);
+            }
+            fclose(f_out);
+            if (!updated) {
+                printf("  [!] Avertissement : aucun emprunt actif trouve pour ce livre.\n");
+            }
+            remove(FICHIER_EMPRUNTS);
+            rename(tmp_path, FICHIER_EMPRUNTS);
+        }
+        fclose(f_in);
     }
 
     // Mettre a jour le stock

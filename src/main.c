@@ -196,7 +196,6 @@ static void menu_principal(Livre biblio[], int *nb_livres) {
 
         case '4':
             rechercher_livre(biblio, *nb_livres);
-            printf("\n  [TODO] Rechercher un livre (titre / auteur / categorie)\n");
             pause_entree();
             break;
 
@@ -208,7 +207,6 @@ static void menu_principal(Livre biblio[], int *nb_livres) {
         case '6':
             if (user_actuel.role == PROFESSEUR) {
                 ajouter_livre(biblio, nb_livres);
-                printf("\n  [TODO] Ajouter un livre au catalogue\n");
             } else {
                 printf("\n  Acces reserve aux professeurs.\n");
             }
