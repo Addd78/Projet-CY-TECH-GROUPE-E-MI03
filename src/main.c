@@ -62,7 +62,8 @@ static char lire_touche(void) {
 
 static void pause_entree(void) {
     printf("  (Appuyez sur Entree pour continuer)");
-    getchar();
+    int m;
+    while ((m = getchar()) != '\n' && m != EOF);
 }
 
 // ─────────────────────────────────────────────
@@ -189,26 +190,24 @@ static void menu_principal(Livre biblio[], int *nb_livres) {
             break;
 
         case '3':
-            // TODO : appeler afficher_emprunts_utilisateur() depuis emprunts.c
-            printf("\n  [TODO] Affichage de vos emprunts en cours\n");
+            afficher_emprunts_utilisateur(biblio, *nb_livres, &user_actuel);
             pause_entree();
             break;
 
         case '4':
-            rechercher_livre(biblio, nb_livres);
+            rechercher_livre(biblio, *nb_livres);
             printf("\n  [TODO] Rechercher un livre (titre / auteur / categorie)\n");
             pause_entree();
             break;
 
         case '5':
-            afficher_les_livres(biblio, nb_livres);
-            printf("\n  [TODO] Liste complete des livres\n");
+            afficher_les_livres(biblio, *nb_livres);
             pause_entree();
             break;
 
         case '6':
             if (user_actuel.role == PROFESSEUR) {
-                ajouter_livre(biblio, &nb_livres);
+                ajouter_livre(biblio, nb_livres);
                 printf("\n  [TODO] Ajouter un livre au catalogue\n");
             } else {
                 printf("\n  Acces reserve aux professeurs.\n");
@@ -217,8 +216,7 @@ static void menu_principal(Livre biblio[], int *nb_livres) {
             break;
 
         case '7':
-            // TODO : appeler afficher_retards() depuis emprunts.c
-            printf("\n  [TODO] Vos livres en retard\n");
+            afficher_retards(biblio, *nb_livres, &user_actuel);
             pause_entree();
             break;
 

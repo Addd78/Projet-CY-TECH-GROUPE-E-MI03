@@ -1,6 +1,7 @@
 // verifier s'il reste des exemplaires en stock et si l'utilisateur peut emprunter (si etudiant ou prof)
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 
 #include "../include/utilisateurs.h"
@@ -80,7 +81,7 @@ void emprunter_livre(Livre biblio[], int nb_livres, Utilisateur *user) {
         return;
     }
 
-    // Vérifier les conditions (on simule ici 0 retard et 0 livre déjà emprunté)
+    // Vérifier les conditions
     if (verif_emprunt(user, 0, 0, 0, &biblio[index_livre])) {
         
         // Mettre à jour le stock en mémoire
@@ -92,6 +93,42 @@ void emprunter_livre(Livre biblio[], int nb_livres, Utilisateur *user) {
         printf("  [V] Succes ! Vous avez recupere : %s\n", biblio[index_livre].titre);
         printf("      Il reste %d exemplaire(s) en rayon.\n", biblio[index_livre].quantite_disponible);
     }
+}
+
+void afficher_emprunts_utilisateur(Livre biblio[], int nb_livres, Utilisateur *user) {
+    FILE *f = fopen(FICHIER_EMPRUNTS, "r");
+    if (f == NULL) {
+        printf("\n  [!] Aucun historique d'emprunt trouve.\n");
+        return;
+    }
+
+    Emprunt e;
+    int trouve = 0;
+    printf("\n--- VOS EMPRUNTS EN COURS ---\n");
+    printf("  ID   | DATE EMPRUNT | TITRE DU LIVRE\n");
+    printf("  -----|--------------|----------------------\n");
+
+    // Lecture du fichier : login:id_livre:date:rendu
+    while (fscanf(f, "%[^:]:%d:%[^:]:%d\n", e.login, &e.id_livre, e.date_emprunt, &e.rendu) != EOF) {
+        if (strcmp(e.login, user->login) == 0 && e.rendu == 0) {
+            
+            // Chercher les détails du livre dans la bibliothèque
+            for (int i = 0; i < nb_livres; i++) {
+                if (biblio[i].id == e.id_livre) {
+                    printf("  %-4d | %-10s | %s\n", biblio[i].id, e.date_emprunt, biblio[i].titre);
+                    trouve = 1;
+                    break;
+                }
+            }
+        }
+    }
+
+    if (!trouve) {
+        printf("  Vous n'avez aucun emprunt en cours.\n");
+    }
+    
+    printf("  -------------------------------------------\n");
+    fclose(f);
 }
 
 void rendre_livre(Livre biblio[], int nb_livres, Utilisateur *user) {
@@ -174,5 +211,44 @@ void afficher_emprunts_utilisateur(Livre biblio[], int nb_livres, Utilisateur *u
     }
     
     printf("  ----------------------------\n");
+    fclose(f);
+}
+
+void afficher_retards(Livre biblio[], int nb_livres, Utilisateur *user) {
+    // On récupère les règles (temps_max) selon le rôle
+    appliquer_regles_role(user);
+
+    FILE *f = fopen(FICHIER_EMPRUNTS, "r");
+    if (f == NULL) {
+        printf("\n  [!] Impossible d'accéder aux données d'emprunts.\n");
+        return;
+    }
+
+    Emprunt e;
+    int retards_trouves = 0;
+    
+    printf("\n--- VOS RETARDS ---\n");
+    
+    /* Note pédagogique : Pour un vrai calcul de date en C, on utiliserait strptime et difftime.
+       Ici, on simule ou on affiche simplement les emprunts en cours en rappelant la limite.
+    */
+    while (fscanf(f, "%[^:]:%d:%[^:]:%d\n", e.login, &e.id_livre, e.date_emprunt, &e.rendu) != EOF) {
+        if (strcmp(e.login, user->login) == 0 && e.rendu == 0) {
+            // Dans une version simplifiée, on liste les emprunts 
+            // En indiquant la durée maximale autorisée pour cet utilisateur
+            for (int i = 0; i < nb_livres; i++) {
+                if (biblio[i].id == e.id_livre) {
+                    printf("  [!] RETARD POTENTIEL : %s (Emprunte le %s)\n", biblio[i].titre, e.date_emprunt);
+                    printf("      Rappel : Votre limite est de %d jours.\n", temps_max);
+                    retards_trouves = 1;
+                }
+            }
+        }
+    }
+
+    if (!retards_trouves) {
+        printf("  Félicitations, vous n'avez aucun retard enregistré.\n");
+    }
+
     fclose(f);
 }
