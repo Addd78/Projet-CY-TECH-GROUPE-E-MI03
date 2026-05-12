@@ -41,6 +41,7 @@ void sauvegarder_livres(Livre biblio[], int nbLivres) {
             biblio[i].id,
             biblio[i].titre,
             biblio[i].auteur,
+            biblio[i].categorie,
             biblio[i].quantite_totale,
             biblio[i].quantite_disponible);
     }
@@ -80,12 +81,6 @@ void rechercher_livre(Livre biblio[], int nbLivres) {
     printf("  Entrez un mot-cle (titre, auteur, categorie) : ");
     
     fgets(recherche, sizeof(recherche), stdin);
-
-    scanf("%49[^\n]",recherche);
-
-    int c;
-    while ((c = getchar()) != '\n' && c != EOF);
-    
     recherche[strcspn(recherche, "\n")] = '\0';
 
     printf("\n  Resultats pour \"%s\" :\n", recherche);
@@ -96,12 +91,12 @@ void rechercher_livre(Livre biblio[], int nbLivres) {
             strstr(biblio[i].auteur, recherche) != NULL || 
             strstr(biblio[i].categorie, recherche) != NULL){
             
-            printf("  [%d] %-20s | %-15s | %d dispo\n", 
+            printf("  [%d] %-20s | %-15s | %d/%d dispo\n", 
                 biblio[i].id,
                 biblio[i].titre,
                 biblio[i].auteur,
-                biblio[i].quantite_totale,
-                biblio[i].quantite_disponible);
+                biblio[i].quantite_disponible,
+                biblio[i].quantite_totale);
             trouve = 1;
         }
         
