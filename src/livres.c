@@ -25,8 +25,8 @@ int charger_livres(Livre biblio[], int *nbLivres){
         biblio[*nbLivres].titre, 
         biblio[*nbLivres].auteur,
         biblio[*nbLivres].categorie,
-        &biblio[*nbLivres].quantite_totale,
-        &biblio[*nbLivres].quantite_disponible) == 6) {
+        &biblio[*nbLivres].quantite_disponible,
+        &biblio[*nbLivres].quantite_totale) == 6) {
             (*nbLivres)++;
     }
     fclose(f);
@@ -42,8 +42,8 @@ void sauvegarder_livres(Livre biblio[], int nbLivres) {
             biblio[i].titre,
             biblio[i].auteur,
             biblio[i].categorie,
-            biblio[i].quantite_totale,
-            biblio[i].quantite_disponible);
+            biblio[i].quantite_disponible,
+            biblio[i].quantite_totale);
     }
     fclose(f);
 }
@@ -64,8 +64,8 @@ void afficher_les_livres(Livre biblio[], int nbLivres) {
                 biblio[i].id,
                 biblio[i].titre,
                 biblio[i].auteur,
-                biblio[i].quantite_totale,
-                biblio[i].quantite_disponible);
+                biblio[i].quantite_disponible,
+                biblio[i].quantite_totale);
         }
     }
 
