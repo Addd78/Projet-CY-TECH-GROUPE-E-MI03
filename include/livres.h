@@ -8,8 +8,8 @@ typedef struct {
     char titre[MAX_STR];
     char auteur[MAX_STR];
     char categorie[MAX_STR];
-    int quantite_totale;
     int quantite_disponible;
+    int quantite_totale;
 } Livre;
 
 // Charge les livres depuis le fichier data/livres.txt.
