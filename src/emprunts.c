@@ -16,7 +16,7 @@ static int temps_max;
 // ─────────────────────────────────────────────
 //  REGLES SELON LE ROLE
 // ─────────────────────────────────────────────
-void appliquer_regles_role(Utilisateur *personne) {
+int appliquer_regles_role(Utilisateur *personne) {
     if (personne->role == PROFESSEUR) {
         livre_max = 5;
         temps_max = 180;
@@ -53,7 +53,14 @@ int verif_emprunt(Utilisateur *personne, int temps_actuel,
                livres_empruntes, livre_max);
         return 0;
     }
-
+    /*
+    if (livres_empruntes >= ) {
+        printf("Refus : limite de livres depassee (%d/%d).\n",
+               livres_empruntes, livre_max);
+        return 0;
+    }
+    */
+    
     // Temps depasse ?
     if (temps_actuel > temps_max) {
         printf("Refus : temps depasse (%ds/%ds).\n", temps_actuel, temps_max);
