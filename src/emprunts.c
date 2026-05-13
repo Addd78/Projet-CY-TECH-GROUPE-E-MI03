@@ -16,7 +16,7 @@ static int temps_max;
 // ─────────────────────────────────────────────
 //  REGLES SELON LE ROLE
 // ─────────────────────────────────────────────
-int appliquer_regles_role(Utilisateur *personne) {
+void appliquer_regles_role(Utilisateur *personne) {
     if (personne->role == PROFESSEUR) {
         livre_max = 5;
         temps_max = 180;
@@ -71,6 +71,27 @@ int verif_emprunt(Utilisateur *personne, int temps_actuel,
     return 1;
 }
 
+
+// ─────────────────────────────────────────────
+//  COMPTER LES EMPRUNTS ACTIFS
+// ─────────────────────────────────────────────
+int compter_livres_empruntes(Utilisateur *user) {
+    FILE *f = fopen(FICHIER_EMPRUNTS, "r");
+    if (f == NULL) return 0; // Si le fichier n'existe pas, 0 emprunts
+
+    Emprunt e;
+    int count = 0;
+    // On lit le fichier et on compte les livres non rendus par cet utilisateur
+    while (fscanf(f, "%[^:]:%d:%[^:]:%d\n", e.login, &e.id_livre, e.date_emprunt, &e.rendu) == 4) {
+        if (strcmp(e.login, user->login) == 0 && e.rendu == 0) {
+            count++;
+        }
+    }
+    fclose(f);
+    return count;
+}
+
+
 // ─────────────────────────────────────────────
 //  EMPRUNTER UN LIVRE
 // ─────────────────────────────────────────────
@@ -100,8 +121,11 @@ void emprunter_livre(Livre biblio[], int nb_livres, Utilisateur *user) {
         return;
     }
 
-    // Verifier les conditions d'emprunt
-    if (verif_emprunt(user, 0, 0, 0, &biblio[index_livre])) {
+    // Compter combien de livres l'utilisateur a déjà
+    int emprunts_actuels = compter_livres_empruntes(user);
+
+    // Verifier les conditions d'emprunt en passant le vrai nombre
+    if (verif_emprunt(user, 0, emprunts_actuels, 0, &biblio[index_livre])) {
 
         // Mettre a jour le stock en memoire
         biblio[index_livre].quantite_disponible--;
