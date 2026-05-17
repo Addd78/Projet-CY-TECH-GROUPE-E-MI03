@@ -13,7 +13,13 @@ typedef struct {
 
 void appliquer_regles_role(Utilisateur *personne);
 
-// Vérifie si un utilisateur a le droit d'emprunter un livre spécifique
+// Compte les livres actuellement empruntes et non rendus par l'utilisateur
+int compter_livres_empruntes(Utilisateur *user);
+
+// Compte les livres en retard (delai depasse) de l'utilisateur
+int compter_retards(Utilisateur *user);
+
+// Verifie si un utilisateur a le droit d'emprunter un livre specifique
 int verif_emprunt(Utilisateur *personne, int temps_actuel, int livres_empruntes, int nb_livres_retard, Livre *l);
 
 // Gère la procédure d'emprunt (Saisie ID -> Vérification -> Mise à jour stock)

@@ -91,6 +91,55 @@ int compter_livres_empruntes(Utilisateur *user) {
     return count;
 }
 
+// ─────────────────────────────────────────────
+//  CALCULER L'AGE D'UN EMPRUNT EN SECONDES
+// ─────────────────────────────────────────────
+// Convertit une date "JJ/MM/AAAA" en time_t et retourne
+// le nombre de secondes ecoulees depuis cette date.
+// Retourne -1 en cas d'erreur de parsing.
+static long calculer_secondes_depuis(const char *date_str) {
+    int jour, mois, annee;
+    if (sscanf(date_str, "%d/%d/%d", &jour, &mois, &annee) != 3) {
+        return -1;
+    }
+
+    struct tm date_emprunt = {0};
+    date_emprunt.tm_mday  = jour;
+    date_emprunt.tm_mon   = mois - 1;  // tm_mon : 0-11
+    date_emprunt.tm_year  = annee - 1900;
+    date_emprunt.tm_isdst = -1;        // laisser mktime determiner l'heure ete/hiver
+
+    time_t t_emprunt = mktime(&date_emprunt);
+    if (t_emprunt == (time_t)(-1)) return -1;
+
+    time_t t_maintenant = time(NULL);
+    return (long)difftime(t_maintenant, t_emprunt);
+}
+
+// ─────────────────────────────────────────────
+//  COMPTER LES LIVRES EN RETARD
+// ─────────────────────────────────────────────
+// Retourne le nombre de livres non rendus dont le delai est depasse.
+int compter_retards(Utilisateur *user) {
+    appliquer_regles_role(user);
+
+    FILE *f = fopen(FICHIER_EMPRUNTS, "r");
+    if (f == NULL) return 0;
+
+    Emprunt e;
+    int count = 0;
+    while (fscanf(f, "%[^:]:%d:%[^:]:%d\n", e.login, &e.id_livre, e.date_emprunt, &e.rendu) == 4) {
+        if (strcmp(e.login, user->login) == 0 && e.rendu == 0) {
+            long secondes = calculer_secondes_depuis(e.date_emprunt);
+            if (secondes < 0 || secondes > temps_max) {
+                count++;
+            }
+        }
+    }
+    fclose(f);
+    return count;
+}
+
 
 // ─────────────────────────────────────────────
 //  EMPRUNTER UN LIVRE
@@ -121,11 +170,16 @@ void emprunter_livre(Livre biblio[], int nb_livres, Utilisateur *user) {
         return;
     }
 
-    // Compter combien de livres l'utilisateur a déjà
+    // Compter combien de livres l'utilisateur a deja empruntes
     int emprunts_actuels = compter_livres_empruntes(user);
 
-    // Verifier les conditions d'emprunt en passant le vrai nombre
-    if (verif_emprunt(user, 0, emprunts_actuels, 0, &biblio[index_livre])) {
+    // Compter les livres en retard (Bug 2 corrige : on ne passait toujours 0)
+    int retards_actuels = compter_retards(user);
+
+    // Verifier les conditions d'emprunt avec les vraies valeurs
+    // Bug 3 corrige : temps_actuel n'est plus utilise ici car chaque livre
+    // a sa propre date ; la verification du delai se fait via compter_retards.
+    if (verif_emprunt(user, 0, emprunts_actuels, retards_actuels, &biblio[index_livre])) {
 
         // Mettre a jour le stock en memoire
         biblio[index_livre].quantite_disponible--;
@@ -271,6 +325,8 @@ void rendre_livre(Livre biblio[], int nb_livres, Utilisateur *user) {
 // ─────────────────────────────────────────────
 //  AFFICHER LES RETARDS
 // ─────────────────────────────────────────────
+// Bug 5 corrige : on compare maintenant la date d'emprunt a la date
+// actuelle pour determiner si le delai autorise est reellement depasse.
 void afficher_retards(Livre biblio[], int nb_livres, Utilisateur *user) {
     appliquer_regles_role(user);
 
@@ -284,18 +340,35 @@ void afficher_retards(Livre biblio[], int nb_livres, Utilisateur *user) {
     int retards_trouves = 0;
 
     printf("\n--- VOS RETARDS ---\n");
+    printf("  (Limite : %d seconde(s) par livre pour votre role)\n\n", temps_max);
 
     // Format du fichier : login:id_livre:date:rendu
     while (fscanf(f, "%[^:]:%d:%[^:]:%d\n",
                   e.login, &e.id_livre, e.date_emprunt, &e.rendu) == 4) {
         if (strcmp(e.login, user->login) == 0 && e.rendu == 0) {
-            for (int i = 0; i < nb_livres; i++) {
-                if (biblio[i].id == e.id_livre) {
-                    printf("  [!] RETARD POTENTIEL : %s (Emprunte le %s)\n",
-                           biblio[i].titre, e.date_emprunt);
-                    printf("      Rappel : Votre limite est de %d secondes.\n",
-                           temps_max);
-                    retards_trouves = 1;
+
+            // Calculer le temps ecoule depuis l'emprunt
+            long secondes_ecoules = calculer_secondes_depuis(e.date_emprunt);
+
+            // Le livre est en retard si le delai est depasse ou si la date est invalide
+            int en_retard = (secondes_ecoules < 0 || secondes_ecoules > temps_max);
+
+            if (en_retard) {
+                for (int i = 0; i < nb_livres; i++) {
+                    if (biblio[i].id == e.id_livre) {
+                        long retard_sec = secondes_ecoules - temps_max;
+                        printf("  [!] EN RETARD : %s\n", biblio[i].titre);
+                        printf("      Emprunte le : %s\n", e.date_emprunt);
+                        if (secondes_ecoules >= 0) {
+                            printf("      Temps ecoule : %ld s  |  Limite : %d s  |  Retard : %ld s\n",
+                                   secondes_ecoules, temps_max, retard_sec);
+                        } else {
+                            printf("      [!] Date d'emprunt illisible, retard suppose.\n");
+                        }
+                        printf("\n");
+                        retards_trouves = 1;
+                        break;
+                    }
                 }
             }
         }

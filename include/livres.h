@@ -2,7 +2,7 @@
 #define LIVRES_H
 #define MAX_STR 100
 
-// Structure du livre : ID;Titre;Auteur;Categorie;Total;Dispo
+// Structure du livre : ID;Titre;Auteur;Categorie;Dispo;Totale
 typedef struct {
     int id;
     char titre[MAX_STR];
