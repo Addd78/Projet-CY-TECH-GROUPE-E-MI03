@@ -27,20 +27,20 @@ static void afficher_bandeau(const char *titre) {
 }
 static void afficher_option(const char *touche, const char *label, int disponible) {
     if (disponible) {
-        printf("  %s. %s\n", touche, label);
+        printf("%s. %s\n", touche, label);
     } else {
-        printf("  %s. %s  (prof uniquement)\n", touche, label);
+        printf("%s. %s  (prof uniquement)\n", touche, label);
     }
 }
 // C'est une fonction qui à un rôle de listener (listen la touche )
 static char lire_touche(void) {
     char buf[8];
-    printf("\n  Entrez votre choix : ");
+    printf("\nEntrez votre choix : ");
     if (fgets(buf, sizeof(buf), stdin) == NULL) return '0';
     return buf[0];
 }
 static void pause_entree(void) {
-    printf("  (Appuyez sur Entree pour continuer)");
+    printf("(Appuyez sur Entree pour continuer)");
     int m;
     while ((m = getchar()) != '\n' && m != EOF);
 }
@@ -68,11 +68,11 @@ static void menu_connexion(void) {
             // Appel de la fonction login() depuis utilisateurs.c
             if (login(users, nb_users, login_saisi, mdp_saisi, &user_actuel)) {
                 connecte = 1;
-                printf("\n  Bienvenue, %s ! (%s)\n",
+                printf("\nBienvenue, %s ! (%s)\n",
                        user_actuel.login,
                        user_actuel.role == PROFESSEUR ? "Professeur" : "Etudiant");
             } else {
-                printf("\n  Login ou mot de passe incorrect.\n");
+                printf("\nLogin ou mot de passe incorrect.\n");
             }
             pause_entree();
             break;
@@ -82,33 +82,33 @@ static void menu_connexion(void) {
             char login_saisi[TAILLE_LOGIN];
             char mdp_saisi[TAILLE_MDP];
             char role_saisi[4];
-            printf("\n  Choisissez un login      : ");
+            printf("\nChoisissez un login      : ");
             fgets(login_saisi, sizeof(login_saisi), stdin);
             login_saisi[strcspn(login_saisi, "\n")] = '\0';
-            printf("  Choisissez un mot de passe : ");
+            printf("Choisissez un mot de passe : ");
             fgets(mdp_saisi, sizeof(mdp_saisi), stdin);
             mdp_saisi[strcspn(mdp_saisi, "\n")] = '\0';
-            printf("  Role (0 = Etudiant, 1 = Professeur) : ");
+            printf("Role (0 = Etudiant, 1 = Professeur) : ");
             fgets(role_saisi, sizeof(role_saisi), stdin);
             Role role = (role_saisi[0] == '1') ? PROFESSEUR : ETUDIANT;
             // Appel de la fonction creer_compte() depuis utilisateurs.c
             int resultat = creer_compte(users, &nb_users,
                                         login_saisi, mdp_saisi, role);
             if (resultat == 1) {
-                printf("\n  Compte cree avec succes ! Vous pouvez maintenant vous connecter.\n");
+                printf("\nCompte cree avec succes ! Vous pouvez maintenant vous connecter.\n");
             } else if (resultat == 0) {
-                printf("\n  Ce login est deja utilise, choisissez-en un autre.\n");
+                printf("\nCe login est deja utilise, choisissez-en un autre.\n");
             } else {
-                printf("\n  Erreur lors de la creation du compte.\n");
+                printf("\nErreur lors de la creation du compte.\n");
             }
             pause_entree();
             break;
         }
         case '0':
-            printf(CLEAR "  Au revoir !\n\n");
+            printf(CLEAR "Au revoir !\n\n");
             exit(0);
         default:
-            printf("\n  Choix invalide.\n");
+            printf("\nChoix invalide.\n");
             pause_entree();
             break;
     }
@@ -118,7 +118,7 @@ static void menu_principal(Livre biblio[], int *nb_livres) {
     printf(CLEAR);
     afficher_bandeau("MENU PRINCIPAL");
     printf("\n");
-    printf("  Connecte en tant que : %s (%s)\n\n",
+    printf("Connecte en tant que : %s (%s)\n\n",
            user_actuel.login,
            user_actuel.role == PROFESSEUR ? "Professeur" : "Etudiant");
     afficher_option("1", "Emprunter un livre", 1);
@@ -126,8 +126,7 @@ static void menu_principal(Livre biblio[], int *nb_livres) {
     afficher_option("3", "Mes emprunts en cours", 1);
     afficher_option("4", "Rechercher un livre", 1);
     afficher_option("5", "Liste de tous les livres", 1);
-    afficher_option("6", "Ajouter un livre au catalogue",
-                    user_actuel.role == PROFESSEUR);
+    afficher_option("6", "Ajouter un livre au catalogue", user_actuel.role == PROFESSEUR);
     afficher_option("7", "Voir mes retards", 1);
     afficher_option("9", "Se deconnecter", 1);
     afficher_option("0", "Quitter l'application", 1);
@@ -159,7 +158,7 @@ static void menu_principal(Livre biblio[], int *nb_livres) {
             if (user_actuel.role == PROFESSEUR) {
                 ajouter_livre(biblio, nb_livres);
             } else {
-                printf("\n  Acces reserve aux professeurs.\n");
+                printf("\nAcces reserve aux professeurs.\n");
             }
             pause_entree();
             break;
@@ -172,10 +171,10 @@ static void menu_principal(Livre biblio[], int *nb_livres) {
             memset(&user_actuel, 0, sizeof(user_actuel));
             break;
         case '0':
-            printf(CLEAR "  Au revoir !\n\n");
+            printf(CLEAR "Au revoir !\n\n");
             exit(0);
         default:
-            printf("\n  Choix invalide.\n");
+            printf("\nChoix invalide.\n");
             pause_entree();
             break;
     }
@@ -187,7 +186,7 @@ int main(void) {
     nb_users = charger_utilisateurs(users, MAX_UTILISATEURS);
     charger_livres(biblio, &nb_livres);
     if (nb_users == -1) {
-        printf("  Erreur : impossible de charger les utilisateurs.\n");
+        printf("Erreur : impossible de charger les utilisateurs.\n");
         return 1;
     }
     while (1) {
