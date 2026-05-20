@@ -50,12 +50,12 @@ static void pause_entree(void) {
 }
 static void menu_connexion(void) {
     printf(CLEAR);
-    // Encadrement vert avec emojis livres
-    printf(VERT "╔══════════════════════════════════════════════════╗\n" RESET);
-    printf(VERT "║" RESET "   📚  Bienvenue sur CY-biblioTECH  📚             " VERT "║\n" RESET);
-    printf(VERT "║" RESET "        Votre bibliotheque numerique               " VERT "║\n" RESET);
-    printf(VERT "║" RESET "   📖  📗  📘  📙  📕  📓  📔  📒  📚  📖         " VERT "║\n" RESET);
-    printf(VERT "╚══════════════════════════════════════════════════╝\n" RESET);
+    // Encadrement vert style ASCII retro (compatible tous terminaux)
+    printf(VERT "+==================================================+\n" RESET);
+    printf(VERT "|" RESET "   [#]  Bienvenue sur CY-biblioTECH  [#]          " VERT "|\n" RESET);
+    printf(VERT "|" RESET "        Votre bibliotheque numerique               " VERT "|\n" RESET);
+    printf(VERT "|" RESET "   [~]  [~]  [~]  [~]  [~]  [~]  [~]  [~]  [~]   " VERT "|\n" RESET);
+    printf(VERT "+==================================================+\n" RESET);
     printf("\n");
     afficher_bandeau("CY-biblioTECH");
     printf("\n");
@@ -79,9 +79,7 @@ static void menu_connexion(void) {
             // Appel de la fonction login() depuis utilisateurs.c
             if (login(users, nb_users, login_saisi, mdp_saisi, &user_actuel)) {
                 connecte = 1;
-                printf("\nBienvenue, %s ! (%s)\n",
-                       user_actuel.login,
-                       user_actuel.role == PROFESSEUR ? "Professeur" : "Etudiant");
+                printf("\nBienvenue, %s ! (%s)\n", user_actuel.login, user_actuel.role == PROFESSEUR ? "Professeur" : "Etudiant");
             } else {
                 printf("\nLogin ou mot de passe incorrect.\n");
             }
@@ -129,9 +127,7 @@ static void menu_principal(Livre biblio[], int *nb_livres) {
     printf(CLEAR);
     afficher_bandeau("MENU PRINCIPAL");
     printf("\n");
-    printf("Connecte en tant que : %s (%s)\n\n",
-           user_actuel.login,
-           user_actuel.role == PROFESSEUR ? "Professeur" : "Etudiant");
+    printf("Connecte en tant que : %s (%s)\n\n", user_actuel.login, user_actuel.role == PROFESSEUR ? "Professeur" : "Etudiant");
     afficher_option("1", "Emprunter un livre", 1);
     afficher_option("2", "Rendre un livre", 1);
     afficher_option("3", "Mes emprunts en cours", 1);
