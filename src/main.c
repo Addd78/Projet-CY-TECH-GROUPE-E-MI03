@@ -9,6 +9,10 @@
 // Séquence ANSI pour pouvoir clear et réafficher le terminal (trouvé sur internet) : (\033 : Echap , [2J : Efface tout l'écran, \033[H : Remet le curseur en haut a gauche) 
 #define CLEAR "\033[2J\033[H"
 #define LARGEUR 50
+// Couleurs ANSI
+#define VERT   "\033[32m"
+#define ROUGE  "\033[31m"
+#define RESET  "\033[0m"
 // On charge les donnés des users au début
 static Utilisateur  users[MAX_UTILISATEURS];  // tableau de tous les utilisateurs
 static int nb_users = 0;             // nombre d'utilisateurs charges
@@ -46,6 +50,13 @@ static void pause_entree(void) {
 }
 static void menu_connexion(void) {
     printf(CLEAR);
+    // Encadrement vert avec emojis livres
+    printf(VERT "╔══════════════════════════════════════════════════╗\n" RESET);
+    printf(VERT "║" RESET "   📚  Bienvenue sur CY-biblioTECH  📚             " VERT "║\n" RESET);
+    printf(VERT "║" RESET "        Votre bibliotheque numerique               " VERT "║\n" RESET);
+    printf(VERT "║" RESET "   📖  📗  📘  📙  📕  📓  📔  📒  📚  📖         " VERT "║\n" RESET);
+    printf(VERT "╚══════════════════════════════════════════════════╝\n" RESET);
+    printf("\n");
     afficher_bandeau("CY-biblioTECH");
     printf("\n");
     afficher_option("1", "Se connecter", 1);
