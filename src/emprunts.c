@@ -8,6 +8,9 @@
 #include "../include/livres.h"
 #include "../include/emprunts.h"
 
+#define ROUGE  "\033[31m"
+#define RESET  "\033[0m"
+
 #define FICHIER_EMPRUNTS "data/emprunts.txt"
 
 // Il y a des limites selon les rôles, on doit s'y tenir 120 secondes pour un élève et 180 pour un prof
@@ -223,7 +226,7 @@ void afficher_emprunts_utilisateur(Livre biblio[], int nb_livres, Utilisateur *u
                     if (restant > 0) {
                         printf("%-4d | %-20s | %ld s restante(s)\n", biblio[i].id, biblio[i].titre, restant);
                     } else {
-                        printf("%-4d | %-20s | EN RETARD (%ld s)\n", biblio[i].id, biblio[i].titre, -restant);
+                        printf(ROUGE "%-4d | %-20s | EN RETARD (%ld s)" RESET "\n", biblio[i].id, biblio[i].titre, -restant);
                     }
                     trouve = 1;
                     break;
@@ -257,8 +260,8 @@ void afficher_retards(Livre biblio[], int nb_livres, Utilisateur *user) {
             if (ecoule > temps_max) {
                 for (int i = 0; i < nb_livres; i++) {
                     if (biblio[i].id == e.id_livre) {
-                        printf("[!] EN RETARD : %s\n", biblio[i].titre);
-                        printf("Temps ecoule : %ld s  |  Limite : %d s  |  Retard : %ld s\n\n", ecoule, temps_max, ecoule - temps_max);
+                        printf(ROUGE "[!] EN RETARD : %s" RESET "\n", biblio[i].titre);
+                        printf(ROUGE "Temps ecoule : %ld s  |  Limite : %d s  |  Retard : %ld s" RESET "\n\n", ecoule, temps_max, ecoule - temps_max);
                         retards_trouves = 1;
                         break;
                     }
