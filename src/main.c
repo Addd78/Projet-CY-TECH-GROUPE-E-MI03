@@ -132,8 +132,8 @@ static void menu_connexion(void) {
     // Encadrement ASCII retro — compatible tous terminaux (pas d'UTF-8)
     printf(VERT  "+==================================================+\n" RESET);
     printf(VERT  "|" JAUNE BOLD "   [~]  Bienvenue sur CY-biblioTECH  [~]" RESET VERT "          |\n" RESET);
-    printf(VERT  "|" GRIS  "        Votre bibliotheque numerique               " VERT "|\n" RESET);
-    printf(VERT  "|" CYAN  "   [*]  [*]  [*]  [*]  [*]  [*]  [*]  [*]  [*]   " VERT "|\n" RESET);
+    printf(VERT  "|" GRIS  "        Votre bibliotheque numerique              " VERT "|\n" RESET);
+    printf(VERT  "|" CYAN  "   [*]  [*]  [*]  [*]  [*]  [*]  [*]  [*]  [*]   " VERT " |\n" RESET);
     printf(VERT  "+==================================================+\n" RESET);
     printf("\n");
     afficher_bandeau("CY-biblioTECH");
