@@ -16,3 +16,25 @@ La vraie force du programme réside dans son gestionnaire de règles métiers au
 
 Chaque transaction valide (emprunt ou retour) recalcule instantanément l'état des stocks disponibles et met à jour les fichiers de persistance. Enfin, un module d'alerte permet à chacun de vérifier l'état de ses emprunts en cours et de lister ses retards potentiels par rapport aux limites fixées par son statut.
 
+Pour faire fonctionner l'application :
+  - Un compilateur C comme GCC
+  - L'utilitaire Makefile
+
+Pour le compiler :
+  - Ouvrir un terminal à la racine du dossier de l'application
+  - Taper "make" puis Entrée
+
+Pour l'exécuter :
+  - Taper "./cy_bibliotech" puis Entrée
+
+Pour Naviguer dans l'application :
+    Dans les menus vous trouvez des actions permettant de naviguer et pour les actionner vous devez taper le chiffre present sur la gauche de celles-ci.
+    Pour sélectionner un livre vous devez taper l'ID de celui-ci, qui se situe entre 1 et 200, et pour trouver l'ID du livre que vous cherchez, il se trouve dans la liste des livres (tout à gauche).
+
+Pour nettoyer les fichiers objets :
+  - Taper "make clean" puis Entrée
+
+Pour recompiler le programme :
+  - Taper "make re" puis Entrée
+
+
